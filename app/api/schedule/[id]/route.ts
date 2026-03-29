@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getDashboardSnapshot, setScheduleItemCompleted } from '@/lib/firebase-store'
+import { getDashboardSnapshot, setScheduleItemCompleted, deleteScheduleItem } from '@/lib/firebase-store'
 
 export async function PATCH(
   request: Request,
@@ -16,6 +16,18 @@ export async function PATCH(
     return NextResponse.json({ error: 'completed must be a boolean' }, { status: 400 })
   }
   const ok = await setScheduleItemCompleted(id, body.completed)
+  if (!ok) {
+    return NextResponse.json({ error: 'Schedule item not found' }, { status: 404 })
+  }
+  return NextResponse.json(await getDashboardSnapshot())
+}
+
+export async function DELETE(
+  request: Request,
+  context: { params: Promise<{ id: string }> }
+) {
+  const { id } = await context.params
+  const ok = await deleteScheduleItem(id)
   if (!ok) {
     return NextResponse.json({ error: 'Schedule item not found' }, { status: 404 })
   }

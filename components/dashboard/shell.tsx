@@ -28,6 +28,15 @@ export function DashboardShell({ initialData }: DashboardShellProps) {
     setData(next)
   }, [])
 
+  const deleteScheduleItem = useCallback(async (id: string) => {
+    const res = await fetch(`/api/schedule/${id}`, {
+      method: 'DELETE',
+    })
+    if (!res.ok) return
+    const next: DashboardSnapshot = await res.json()
+    setData(next)
+  }, [])
+
   const addReminder = useCallback(
     async (input: { time: string; label: string; type: ScheduleItem['type'] }) => {
       const res = await fetch('/api/schedule', {
@@ -89,6 +98,7 @@ export function DashboardShell({ initialData }: DashboardShellProps) {
               schedule={data.schedule}
               onToggleComplete={patchScheduleItem}
               onAddReminder={addReminder}
+              onDeleteReminder={deleteScheduleItem}
             />
           )}
           {activeTab === 'activity' && <ActivityLogTab events={data.activity} />}

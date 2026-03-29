@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from 'react'
 import { cn } from '@/lib/utils'
 import type { ScheduleItem } from '@/lib/dashboard-types'
-import { Plus, GripVertical, Pill, Utensils, Dumbbell, Calendar, ChevronDown, SunMedium, HeartHandshake } from 'lucide-react'
+import { Plus, GripVertical, Pill, Utensils, Dumbbell, Calendar, ChevronDown, SunMedium, HeartHandshake, X } from 'lucide-react'
 
 type ScheduleTabProps = {
   schedule: ScheduleItem[]
@@ -13,6 +13,7 @@ type ScheduleTabProps = {
     label: string
     type: ScheduleItem['type']
   }) => Promise<{ ok: boolean; error?: string }>
+  onDeleteReminder?: (id: string) => void | Promise<void>
 }
 
 const typeConfig: Record<
@@ -44,7 +45,7 @@ const typeConfig: Record<
 const filterTypes = ['All', 'Meal', 'Medication', 'Exercise', 'Other'] as const
 type FilterType = (typeof filterTypes)[number]
 
-export function ScheduleTab({ schedule, onToggleComplete, onAddReminder }: ScheduleTabProps) {
+export function ScheduleTab({ schedule, onToggleComplete, onAddReminder, onDeleteReminder }: ScheduleTabProps) {
   const [activeFilter, setActiveFilter] = useState<FilterType>('All')
   const [showAddForm, setShowAddForm] = useState(false)
   const [newLabel, setNewLabel] = useState('')
@@ -307,10 +308,16 @@ export function ScheduleTab({ schedule, onToggleComplete, onAddReminder }: Sched
                   </div>
 
                   {/* Event card */}
-                  <button
-                    type="button"
-                    disabled={!onToggleComplete}
+                  <div
+                    role={onToggleComplete ? 'button' : undefined}
+                    tabIndex={onToggleComplete ? 0 : undefined}
                     onClick={() => onToggleComplete?.(item.id, !item.completed)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault()
+                        onToggleComplete?.(item.id, !item.completed)
+                      }
+                    }}
                     className={cn(
                       'flex-1 flex items-center justify-between px-4 py-3 rounded-xl border bg-card text-left',
                       'shadow-[0_1px_4px_-2px_rgba(0,0,0,0.05)]',
@@ -344,18 +351,31 @@ export function ScheduleTab({ schedule, onToggleComplete, onAddReminder }: Sched
                     <div className="flex items-center gap-2">
                       <span
                         className={cn(
-                          'text-[10px] font-medium px-2 py-0.5 rounded-full border',
+                          'text-[10px] font-medium px-2 py-0.5 rounded-full border hidden sm:block',
                           config.badgeClass
                         )}
                       >
                         {config.label}
                       </span>
+                      {onDeleteReminder && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            onDeleteReminder(item.id)
+                          }}
+                          className="p-1.5 -mr-1 rounded-md text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                          aria-label="Remove cue"
+                        >
+                          <X className="w-4 h-4" strokeWidth={2} />
+                        </button>
+                      )}
                       <GripVertical
-                        className="w-4 h-4 text-muted-foreground/40 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity duration-150"
+                        className="w-4 h-4 text-muted-foreground/40 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity duration-150 hidden sm:block"
                         strokeWidth={1.75}
                       />
                     </div>
-                  </button>
+                  </div>
                 </div>
               )
             })}

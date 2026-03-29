@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { addFace, listFaces } from "@/lib/firebase-store";
-import { mkdir, writeFile } from "fs/promises";
-import path from "path";
+import { put } from '@vercel/blob';
 
 export async function GET() {
   try {
@@ -24,20 +23,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Missing required fields." }, { status: 400 });
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
     const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '-')
     const filename = `face-${Date.now()}-${safeName || 'upload.jpg'}`
-    const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-    const uploadPath = path.join(uploadDir, filename)
 
-    await mkdir(uploadDir, { recursive: true })
-    await writeFile(uploadPath, buffer)
+    const blob = await put(filename, file, {
+      access: 'public',
+    });
 
     const newFace = await addFace({
       name,
       relationship,
-      imageUrl: `/uploads/${filename}`,
+      imageUrl: blob.url,
     })
 
     return NextResponse.json(newFace, { status: 201 });
