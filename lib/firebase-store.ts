@@ -298,3 +298,25 @@ export async function setScheduleItemCompleted(id: string, completed: boolean): 
 
   return true
 }
+
+export async function deleteScheduleItem(id: string): Promise<boolean> {
+  await ensurePatientBootstrap()
+
+  const reminderRef = scheduleCollection().doc(id)
+  const snapshot = await reminderRef.get()
+  if (!snapshot.exists) {
+    return false
+  }
+
+  const data = snapshot.data() as ScheduleDoc
+  await reminderRef.delete()
+
+  await writeActivityEvent({
+    occurredAt: new Date().toISOString(),
+    type: 'system',
+    description: `Removed reminder: "${data.label}".`,
+    severity: 'info',
+  })
+
+  return true
+}
