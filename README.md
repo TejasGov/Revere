@@ -251,39 +251,7 @@ Revere explores how AI, wearable technology, and caregiver tools can support tho
 The goal is not to replace care.
 The goal is to make care feel lighter, calmer, and more continuous.
 
-🧪 Use Cases
 
-This project works especially well as a:
-
-🏆 Hackathon demo site
-💼 Portfolio case study
-🚀 Startup landing page MVP
-📣 Pitch deck companion website
-🧠 Health-tech concept showcase
-🎨 Frontend motion design project
-🔮 Future Improvements
-Product / Content
- Add a polished product overview video
- Add FAQ section for caregivers and families
- Add a "How It Works" section
- Add caregiver dashboard screenshots
- Add architecture diagram
- Add validation or research references
- Add waitlist / contact CTA
-Frontend / UX
- Improve mobile performance
- Add reduced motion accessibility mode
- Optimize media loading
- Improve lazy loading strategy
- Add analytics and conversion tracking
- Add Open Graph preview image
- Improve Lighthouse performance
-Engineering
- Refactor reusable animation hooks
- Modularize large page logic
- Migrate to TypeScript
- Add linting / formatting standards
- Add UI tests for key sections
 🔗 Related Links
 🌐 Landing Page: revere-jet.vercel.app
 🧑‍⚕️ Caretaker Mode: revere-dashboard.vercel.app
